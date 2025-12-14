@@ -1,0 +1,37 @@
+# Config file for Air (https://github.com/cosmtrek/air)
+# See https://github.com/cosmtrek/air#configuration for all options
+
+[build]
+  # Working directory
+  # . = current directory
+  # You can change this if your main.go is in a subfolder
+  bin = "./tmp/main"
+  cmd = "go build -o ./tmp/main main.go"
+  include_ext = ["go", "tpl", "tmpl", "html"]
+  exclude_dir = ["vendor", "tmp"]
+  exclude_file = []
+  follow_symlink = false
+  delay = 1000 # ms
+
+[run]
+  cmd = "./tmp/main"
+  # If you want to pass args to your binary, add them here
+  # args = []
+  # env = ["ENV=dev"]
+  # env_file = ".env"
+
+[log]
+  time = true
+
+[color]
+  main = "yellow"
+  watcher = "cyan"
+  build = "green"
+  runner = "magenta"
+  error = "red"
+  notify = "blue"
+
+[debug]
+  enable = false
+  force_polling = false
+  polling_interval = 1000
