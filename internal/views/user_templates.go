@@ -1,3 +1,4 @@
+// Package views provides HTML templates and rendering functions for user-related views.
 package views
 
 import (
