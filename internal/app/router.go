@@ -1,14 +1,17 @@
-package router
+package app
 
 import (
+	"time"
+
 	"github.com/go-chi/chi/v5"
-	"github.com/techhubies/lenslocked/internal/handlers"
+	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/httprate"
 )
 
-func SetupRouter() *chi.Mux {
+func SetupRouter(app *Application, cfg *Config) *chi.Mux {
 	r := chi.NewRouter()
-
-	r.Get("/", handlers.Get)
-
+	r.Use(middleware.Logger)
+	r.Use(httprate.LimitByIP(cfg.RateLimit, time.Minute))
+	r.Get("/", app.UserHandler.Get)
 	return r
 }

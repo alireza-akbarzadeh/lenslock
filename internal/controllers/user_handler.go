@@ -1,25 +1,30 @@
-package handlers
+package controllers
 
 import (
 	"net/http"
 
-	"github.com/techhubies/lenslocked/internal/app"
+	"github.com/techhubies/lenslocked/internal/models"
+	"github.com/techhubies/lenslocked/internal/views"
 )
 
 // UserHandler handles user-related HTTP requests.
 type UserHandler struct {
-	app *app.Application
+	store *models.UserStore
 }
 
 // NewUserHandler creates a new UserHandler.
-func NewUserHandler(application *app.Application) *UserHandler {
+func NewUserHandler(store *models.UserStore) *UserHandler {
 	return &UserHandler{
-		app: application,
+		store: store,
 	}
 }
 
 // Get Example handler method
 func (h *UserHandler) Get(w http.ResponseWriter, r *http.Request) {
-	h.app.Logger.Println("Home handler called")
-	w.Write([]byte("Welcome to the Home Page!"))
+	// log.Println("User list handler called") // Optionally use the standard logger or inject a logger interface
+	users := h.store.All()
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	if err := views.RenderUserList(w, users); err != nil {
+		http.Error(w, "Failed to render user list", http.StatusInternalServerError)
+	}
 }

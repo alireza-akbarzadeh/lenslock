@@ -1,9 +1,9 @@
 package app
 
 import (
+	"os"
+	"strconv"
 	"time"
-
-	"github.com/alireza-akbarzadeh/ginflow/internal/config"
 )
 
 // Config holds all application configuration
@@ -21,13 +21,29 @@ type Config struct {
 // DefaultConfig returns the default configuration loaded from environment
 func DefaultConfig() *Config {
 	return &Config{
-		Port:            config.GetEnvInt("PORT", 8080),
-		JWTSecret:       config.GetEnvString("JWT_SECRET", "some-secret-123456"),
-		DatabaseURL:     config.GetEnvString("DATABASE_URL", ""),
+		Port:            getEnvInt("PORT", 8080),
+		JWTSecret:       getEnvString("JWT_SECRET", "some-secret-123456"),
+		DatabaseURL:     getEnvString("DATABASE_URL", ""),
 		IdleTimeout:     time.Minute,
 		ReadTimeout:     10 * time.Second,
 		WriteTimeout:    30 * time.Second,
 		ShutdownTimeout: 5 * time.Second,
 		RateLimit:       100,
 	}
+}
+
+func getEnvString(key, fallback string) string {
+	if v := os.Getenv(key); v != "" {
+		return v
+	}
+	return fallback
+}
+
+func getEnvInt(key string, fallback int) int {
+	if v := os.Getenv(key); v != "" {
+		if i, err := strconv.Atoi(v); err == nil {
+			return i
+		}
+	}
+	return fallback
 }

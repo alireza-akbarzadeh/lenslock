@@ -1,36 +1,29 @@
 package main
 
 import (
+	"log"
 	"net/http"
-	"time"
+	"os"
 
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
-	"github.com/go-chi/httprate"
 	"github.com/techhubies/lenslocked/internal/app"
+	"github.com/techhubies/lenslocked/internal/controllers"
+	"github.com/techhubies/lenslocked/internal/models"
 )
 
-func HelloWorld(w http.ResponseWriter, r *http.Request) {
-}
-
 func main() {
-	r := chi.NewRouter()
-	r.Use(middleware.Logger)
-	app := app.New()
-	r.Use(httprate.LimitByIP(app.Config.RateLimit, 1*time.Minute))
+	logger := log.New(os.Stdout, "[lenslocked] ", log.LstdFlags)
+	cfg := app.DefaultConfig()
+	userStore := models.NewUserStore()
+	userHandler := controllers.NewUserHandler(userStore)
+	application := &app.Application{
+		Logger:      logger,
+		UserStore:   userStore,
+		UserHandler: userHandler,
+	}
 
-	// Public Routes
-	r.Group(func(r chi.Router) {
-		r.Get("/", HelloWorld)
-
-	})
-
-	//    // Private Routes
-	// // Require Authentication
-	// r.Group(func(r chi.Router) {
-	//     r.Use(AuthMiddleware)
-	//     r.Post("/manage", CreateAsset)
-	// })
-
-	http.ListenAndServe(":3000", r)
+	r := app.SetupRouter(application, cfg)
+	logger.Println("Server starting on :8080")
+	if err := http.ListenAndServe(":8080", r); err != nil {
+		logger.Fatalf("Error starting server: %v", err)
+	}
 }
